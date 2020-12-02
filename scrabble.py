@@ -1,8 +1,11 @@
 import scipy.io
 import numpy as np
 from scipy.linalg import svd
-
-
+import ctypes
+from cDescent_1 import cDescent
+so_file = '/home/upriverbasil/Downloads/SCRABBLE_PYTHON-master/cDescent.so'
+cfactorial = ctypes.CDLL(so_file)
+x = []
 def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7, 0.5], nIter = 20, nIter_inner = 20, error_inner_threshold = 1e-4, error_outer_threshold = 1e-4):
 	
 	data = scipy.io.loadmat('demo_data.mat')
@@ -35,10 +38,11 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 	Y = Y.astype(np.double)
 	B = B.astype(np.double)
 	A = A.astype(np.double)
+	gamma = float(gamma)
 	projection = projection.astype(np.double)
 	newX = newX.astype(np.double)
 	m1,n1 = X.shape[0], X.shape[1]
-
+	# cfactorial.cDescent.argtypes = [ctypes.c float, ,c_double_p,c_double_p,c_double_p,c_double_p,c_double_p,c_double_p ]
 	print("SCRABBLE begins...")
 
 	k = 0
@@ -51,7 +55,11 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 		error_inner = 1
 		X1 = newX
 		while error_inner > error_inner_threshold and l < nIter_inner:
-			newX = cDescent(gamma, Y, B, Lambda, A, projection, newX)
+			m1 = Y.shape[0]
+			n1 = Y.shape[1]
+			x = np.zeros((m1,n1))
+			print(x.shape)
+			newX = cDescent(gamma, Y, B, Lambda, A, projection, newX, x, n1, m1)
 			l = l+1
 			error_inner = np.linalg.norm(np.log10(X1+1)-np.log10(newX+1), ord = 'fro')/(m1*n1)
 			X1 = newX
