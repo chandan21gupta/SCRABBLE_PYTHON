@@ -1,6 +1,6 @@
 import scipy.io
 import numpy as np
-
+from scipy.linalg import svd
 
 
 def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7, 0.5], nIter = 20, nIter_inner = 20, error_inner_threshold = 1e-4, error_outer_threshold = 1e-4):
@@ -59,7 +59,8 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 
 		S = newX + Lambda/gamma
 		tau = alpha/gamma
-		u, s, v = svt(S, 'lambda', tau)
+		#u, s, v = svt(S, 'lambda', tau)
+		u, s, v = svd(S)
 		newY = u*max(s-tau, 0)*np.transpose(v)
 		error = np.linalg.norm(np.log10(X+1)-np.log10(newX+1), ord = 'fro')/(m1*n1)
 		if k == 0:
