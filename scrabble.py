@@ -51,7 +51,7 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 		error_inner = 1
 		X1 = newX
 		while error_inner > error_inner_threshold and l < nIter_inner:
-			newX = cDescent(gamma, Y, B, Lambda, A, zones, newX)
+			newX = cDescent(gamma, Y, B, Lambda, A, projection, newX)
 			l = l+1
 			error_inner = np.linalg.norm(np.log10(X1+1)-np.log10(newX+1), ord = 'fro')/(m1*n1)
 			X1 = newX
