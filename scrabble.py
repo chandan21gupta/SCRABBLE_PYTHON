@@ -3,11 +3,11 @@ import numpy as np
 from scipy.linalg import svd
 import ctypes
 from cDescent_1 import cDescent
-
+import matplotlib.pyplot as plt
 #so_file = '/home/upriverbasil/Downloads/SCRABBLE_PYTHON-master/cDescent.so'
 #cfactorial = ctypes.CDLL(so_file)
 x = []
-def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7, 0.5], nIter = 100, nIter_inner = 100, error_inner_threshold = 1e-4, error_outer_threshold = 1e-4):
+def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 1e-4], nIter = 20, nIter_inner = 20, error_inner_threshold = 1e-4, error_outer_threshold = 1e-4):
 	
 	data = scipy.io.loadmat('demo_data.mat')
 	Y = data['data_sc'].transpose()
@@ -45,7 +45,6 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 	m1,n1 = X.shape[0], X.shape[1]
 	# cfactorial.cDescent.argtypes = [ctypes.c float, ,c_double_p,c_double_p,c_double_p,c_double_p,c_double_p,c_double_p ]
 	print("SCRABBLE begins...")
-
 	k = 0
 	error = 1
 
@@ -64,23 +63,27 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 			l = l+1
 			error_inner = np.linalg.norm(np.log10(X1+1)-np.log10(newX+1), ord = 'fro')/(m1*n1)
 			X1 = newX
-			print(error_inner,error_inner_threshold)
+			#print(error_inner,error_inner_threshold)
 			print('The %d-th INNNER iteration and the error is %1.4e\n'%(l,error_inner))
 		S = (newX + Lambda)/gamma
 		tau = alpha/gamma
 		#u, s, v = svt(S, 'lambda', tau)
-		u, s, v = svd(S)
+		u, s, v = svd(S,full_matrices=False)
 
 		#newY = u*np.diag(s-tau).T*np.transpose(v)
-		print(u.shape,np.diag(s-tau).shape,v.shape)
-		newY = np.dot(u*np.diag(s-tau),np.transpose(v))
+		#print(u.shape,(s-tau).shape,v.shape,s.shape)
+		newY = np.dot(u,np.diag(s-tau)*np.transpose(v))
 		error = np.linalg.norm(np.log10(X+1)-np.log10(newX+1), ord = 'fro')/(m1*n1)
 		if k == 0:
 			error = 1
 		k = k+1
 		Lambda = Lambda+gamma*(newX-newY)
-		print('The %d-th iteration and the error is %1.4e\n',k,error)
-
+		print('The %d-th iteration and the error is %1.4e\n'%(k,error))
+	fig, (ax1, ax2) = plt.subplots(1, 2)
+	fig.suptitle('Horizontally stacked subplots')
+	ax1.imshow(np.log10(X+1))
+	ax2.imshow(np.log10(newX+1))
+	fig.show()
 	print('SCRABBLE finished the imputation!')
 
 	return np.transpose(newX)
