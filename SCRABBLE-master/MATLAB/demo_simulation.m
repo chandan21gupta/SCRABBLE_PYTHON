@@ -11,7 +11,7 @@ close all
 %% Load the data
 % There are three datasets in the .mat file. There are the true data set,
 % Drop-out data set, and the imputed data set by SCRABBLE.
-load('demo_data_HF.mat')
+load('demo_data.mat')
 
 %% Prepare the data
 % We construct the data structure which is taken as one of the input of
@@ -21,7 +21,7 @@ data.data_bulk = data_bulk;
 
 %% Prepare the parameter for SCRABBLE
 % set up the parameters used in example
-parameter = [100,2e-7];
+parameter = [100,2e-7,0.5];
 nIter = 100;
 
 %% Run SCRABBLE

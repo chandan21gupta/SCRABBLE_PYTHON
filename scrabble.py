@@ -3,10 +3,10 @@ import numpy as np
 from scipy.linalg import svd
 import ctypes
 from cDescent_1 import cDescent
-so_file = '/home/upriverbasil/Downloads/SCRABBLE_PYTHON-master/cDescent.so'
-cfactorial = ctypes.CDLL(so_file)
+#so_file = '/home/upriverbasil/Downloads/SCRABBLE_PYTHON-master/cDescent.so'
+#cfactorial = ctypes.CDLL(so_file)
 x = []
-def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7, 0.5], nIter = 20, nIter_inner = 20, error_inner_threshold = 1e-4, error_outer_threshold = 1e-4):
+def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7, 0.5], nIter = 100, nIter_inner = 100, error_inner_threshold = 1e-4, error_outer_threshold = 1e-4):
 	
 	data = scipy.io.loadmat('demo_data.mat')
 	Y = data['data_sc'].transpose()
@@ -59,17 +59,22 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 			n1 = Y.shape[1]
 			x = np.zeros((m1,n1))
 			print(x.shape)
+			print(gamma)
 			newX = cDescent(gamma, Y, B, Lambda, A, projection, newX, x, n1, m1)
+			print(newX.shape)
 			l = l+1
 			error_inner = np.linalg.norm(np.log10(X1+1)-np.log10(newX+1), ord = 'fro')/(m1*n1)
 			X1 = newX
-			print('The %d-th INNNER iteration and the error is %1.4e\n',l,error_inner)
-
+			print(error_inner)
+			print('The %d-th INNNER iteration and the error is %1.4e\n'%(l,error_inner))
+		break
 		S = (newX + Lambda)/gamma
 		tau = alpha/gamma
 		#u, s, v = svt(S, 'lambda', tau)
 		u, s, v = svd(S)
-		newY = u*max(s-tau, 0)*np.transpose(v)
+
+		#newY = u*np.diag(s-tau).T*np.transpose(v)
+		newY = np.dot(u*np.diag(s-tau),np.transpose(v))
 		error = np.linalg.norm(np.log10(X+1)-np.log10(newX+1), ord = 'fro')/(m1*n1)
 		if k == 0:
 			error = 1

@@ -1,14 +1,12 @@
+import numpy as np
 def cDescent(gamma, y, b, lamda, a, zones, newX, x, n1, m1):
-	for i in range(0,m1):
-		for j in range(0,n1):
-			index = i+m1*j
-			print(i,j)
-			x[index] = newX[index]
+	x=newX
 	for i in range(0,m1):
 		for j in range(0,n1):
 			temp = 0
 			for k in range(0,m1):
-				temp+=a[i+m1*k]*x[k+m1*j]
-			index = i+m1*j
-			temp = (gamma*y[index]+b[index]-lamda[index]-temp+a[i+m1*i]*x[index])/(a[i+m1*i]+zones[index])
-			x[index] = max(temp,0)
+				temp+=a[i][k]*x[k][j]
+			temp = (gamma*y[i][j]+b[i][j]-lamda[i][j]-temp+a[i][i]*x[i][j])/(a[i][i]+zones[i][j])
+			x[i][j] = max(temp,0)
+	return x
+	#return np.random.rand(m1,n1)

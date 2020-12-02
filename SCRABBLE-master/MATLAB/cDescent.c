@@ -36,10 +36,15 @@ void cDescent(double gamma, double *y, double *b, double *lambda, double *a, dou
 {   /* allocate the variables */
     int i,j,k,index;
     double tmp;
+
+    int size = *(x + 1)-*x;
+
+   printf("Total fields: %d\n", sizeof(*x));
     /* initalize the outpouts */
     for (i = 0; i < m1; i++){
         for(j = 0; j < n1; j++) {
             index = i + m1*j;
+            //printf("%d index",index);
             x[index] = newx[index];
         }
     }    
@@ -118,12 +123,16 @@ void mexFunction( int nlhs, mxArray *plhs[],
     lambda = mxGetPr(lambda_IN);  /* Get pointer to Lambda's data */
     zones = mxGetPr(zones_IN);    /* Get pointer to zones's data */
     newx = mxGetPr(newx_IN);      /* Get pointer to newX's data */
-    
     /* Create matrix for the return argument. */
     x_OUT = mxCreateDoubleMatrix(m1, n1, mxREAL);
+    printf("%d size",sizeof(x_OUT));
     /* Assign pointers to the output matrix */ 
     x = mxGetPr(x_OUT);
-    
+    while(x!=NULL)
+    {
+    printf("%d size",*x);
+    x+=8;
+    }
     /* Do the actual computations in a subroutine */ 
     cDescent(gamma,y,b,lambda,a,zones,newx,x,m1,n1);
 }
