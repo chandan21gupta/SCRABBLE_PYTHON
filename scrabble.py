@@ -22,20 +22,21 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 		Z = data['data_bulk']*Y.shape[1]
 
 	n = Y.shape[0]
-	D = np.ones(1, n)
+	D = np.ones((1, n))
 	A = beta*(np.dot(np.transpose(D), D)) + gamma*(np.identity(n))
-	B = beta*np.dot(np.transpose(D), Z) + Y
+	print(D.shape,Z.shape,Y.shape)
+	B = beta*np.dot(D.T, Z.T) + Y
 
 	X = Y
 	newX = X
 	newY = Y
 	Lambda = np.zeros(shape = Y.shape)
-
-	Y = Y.astype(double)
-	B = B.astype(double)
-	A = A.astype(double)
-	projection = projection.astype(projection)
-	newX = newX.astype(double)
+	#gamma =gamma.astype(np.double)
+	Y = Y.astype(np.double)
+	B = B.astype(np.double)
+	A = A.astype(np.double)
+	projection = projection.astype(np.double)
+	newX = newX.astype(np.double)
 	m1,n1 = X.shape[0], X.shape[1]
 
 	print("SCRABBLE begins...")
@@ -71,6 +72,7 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 
 	return np.transpose(newX)
 
+scrabble_optimization()
 
 
 
