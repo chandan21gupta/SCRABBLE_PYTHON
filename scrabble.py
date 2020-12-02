@@ -47,7 +47,7 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 	print("SCRABBLE begins...")
 	k = 0
 	error = 1
-
+	origX=X
 	while k < nIter and error > error_outer_threshold:
 		X = newX
 		Y = newY
@@ -79,11 +79,15 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 		k = k+1
 		Lambda = Lambda+gamma*(newX-newY)
 		print('The %d-th iteration and the error is %1.4e\n'%(k,error))
-	fig, (ax1, ax2) = plt.subplots(1, 2)
-	fig.suptitle('Horizontally stacked subplots')
-	ax1.imshow(np.log10(X+1))
+	fig, (ax1, ax2,ax3) = plt.subplots(1, 3)
+	ax1.imshow(np.log10(origX+1))
+	ax1.set_title("Orignal Data")
 	ax2.imshow(np.log10(newX+1))
+	ax2.set_title("Imputed Data")
+	ax3.imshow(np.log10(projection+1))
+	ax3.set_title("Dropout")
 	fig.show()
+	plt.show()
 	print('SCRABBLE finished the imputation!')
 
 	return np.transpose(newX)
