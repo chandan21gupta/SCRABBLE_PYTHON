@@ -57,7 +57,7 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 			X1 = newX
 			print('The %d-th INNNER iteration and the error is %1.4e\n',l,error_inner)
 
-		S = newX + Lambda/gamma
+		S = (newX + Lambda)/gamma
 		tau = alpha/gamma
 		u, s, v = svt(S, 'lambda', tau)
 		newY = u*max(s-tau, 0)*np.transpose(v)
