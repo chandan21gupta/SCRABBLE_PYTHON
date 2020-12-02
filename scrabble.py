@@ -3,6 +3,7 @@ import numpy as np
 from scipy.linalg import svd
 import ctypes
 from cDescent_1 import cDescent
+
 #so_file = '/home/upriverbasil/Downloads/SCRABBLE_PYTHON-master/cDescent.so'
 #cfactorial = ctypes.CDLL(so_file)
 x = []
@@ -58,22 +59,20 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [100, 2e-7
 			m1 = Y.shape[0]
 			n1 = Y.shape[1]
 			x = np.zeros((m1,n1))
-			print(x.shape)
-			print(gamma)
 			newX = cDescent(gamma, Y, B, Lambda, A, projection, newX, x, n1, m1)
-			print(newX.shape)
+
 			l = l+1
 			error_inner = np.linalg.norm(np.log10(X1+1)-np.log10(newX+1), ord = 'fro')/(m1*n1)
 			X1 = newX
-			print(error_inner)
+			print(error_inner,error_inner_threshold)
 			print('The %d-th INNNER iteration and the error is %1.4e\n'%(l,error_inner))
-		break
 		S = (newX + Lambda)/gamma
 		tau = alpha/gamma
 		#u, s, v = svt(S, 'lambda', tau)
 		u, s, v = svd(S)
 
 		#newY = u*np.diag(s-tau).T*np.transpose(v)
+		print(u.shape,np.diag(s-tau).shape,v.shape)
 		newY = np.dot(u*np.diag(s-tau),np.transpose(v))
 		error = np.linalg.norm(np.log10(X+1)-np.log10(newX+1), ord = 'fro')/(m1*n1)
 		if k == 0:

@@ -1,6 +1,7 @@
 import numpy as np
+import copy
 def cDescent(gamma, y, b, lamda, a, zones, newX, x, n1, m1):
-	x=newX
+	x=copy.deepcopy(newX)
 	for i in range(0,m1):
 		for j in range(0,n1):
 			temp = 0
