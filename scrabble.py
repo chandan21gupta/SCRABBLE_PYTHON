@@ -28,6 +28,10 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 	error_outer_threshold = Error threshold for outer optimization loop. (Default 1e-4)
 
 	----------
+	Returns
+	----------
+
+	newX = Imputed Data Matrix
 	'''
 	data = scipy.io.loadmat('demo_data.mat')
 	original_data_without_droputs = data['data_true'].transpose()
@@ -114,7 +118,7 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 
 	return np.transpose(newX)
 
-scrabble_optimization()
+X=scrabble_optimization()
 
 
 
