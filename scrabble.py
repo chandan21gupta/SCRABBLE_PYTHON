@@ -12,6 +12,7 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 	data = scipy.io.loadmat('demo_data.mat')
 	Y = data['data_sc'].transpose()
 	projection = Y > 0
+	projection2 = Y <= 0
 
 	alpha = parameters[0]
 	beta = parameters[1]
@@ -84,7 +85,7 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 	ax1.set_title("Orignal Data")
 	ax2.imshow(np.log10(newX+1))
 	ax2.set_title("Imputed Data")
-	ax3.imshow(np.log10(projection+1))
+	ax3.imshow(np.log10(projection2+1))
 	ax3.set_title("Dropout")
 	fig.show()
 	plt.show()
