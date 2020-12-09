@@ -4,11 +4,31 @@ from scipy.linalg import svd
 import ctypes
 from cDescent_1 import cDescent
 import matplotlib.pyplot as plt
-#so_file = '/home/upriverbasil/Downloads/SCRABBLE_PYTHON-master/cDescent.so'
-#cfactorial = ctypes.CDLL(so_file)
+
 x = []
 def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 1e-4], nIter = 20, nIter_inner = 20, error_inner_threshold = 1e-4, error_outer_threshold = 1e-4):
+	'''
+	Scrabble Function to impute input data matrix.
+
+	Parameters
+	-----------
+
+	data_path = path to .mat file
+
+	paramters = alpha -> weight for the rank of the imputed data matrix.
+				beta -> weight for the agreement between the aggregated scRNA-seq and bulk RNA-seq data.
+				gamma -> penalty parameter.
 	
+	nIter = Number of iterations to run the optimization for. (Default 20)
+
+	nIter_inner = Number of iterations to run the inner optimization for. (Default 20)
+
+	error_inner_threshold = Error threshold for inner optimization loop. (Default 1e-4)
+	
+	error_outer_threshold = Error threshold for outer optimization loop. (Default 1e-4)
+
+	----------
+	'''
 	data = scipy.io.loadmat('demo_data.mat')
 	original_data_without_droputs = data['data_true'].transpose()
 	Y = data['data_sc'].transpose()
@@ -19,6 +39,7 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 	beta = parameters[1]
 	gamma = parameters[2]
 
+	#Check Data
 	if 'data_bulk' not in data:
 		beta = 0
 		Z = np.ones((1, Y.shape[1]))
@@ -27,17 +48,17 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 	else:
 		Z = (data['data_bulk'].transpose())*Y.shape[1]
 
+	#Initialise Variables
 	n = Y.shape[0]
 	D = np.ones((1, n))
 	A = beta*(np.dot(np.transpose(D), D)) + gamma*(np.identity(n))
-	print(D.shape,Z.shape,Y.shape)
 	B = np.dot(np.dot(beta,D.T),Z) + Y
 
 	X = np.copy(Y)
 	newX = np.copy(X)
 	newY = np.copy(Y)
 	Lambda = np.zeros(shape = Y.shape)
-	#gamma =gamma.astype(np.double)
+
 	Y = Y.astype(np.double)
 	B = B.astype(np.double)
 	A = A.astype(np.double)
@@ -45,7 +66,7 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 	projection = projection.astype(np.double)
 	newX = newX.astype(np.double)
 	m1,n1 = X.shape[0], X.shape[1]
-	#cfactorial.cDescent.argtypes = [ctypes.c float, ,c_double_p,c_double_p,c_double_p,c_double_p,c_double_p,c_double_p ]
+
 	print("SCRABBLE begins...")
 	k = 0
 	error = 1
@@ -57,6 +78,7 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 		X1 = np.copy(newX)
 		while error_inner > error_inner_threshold and l < nIter_inner:
 			x = np.zeros((m1,n1))
+			#calculate cDesent
 			newX = cDescent(gamma, Y, B, Lambda, A, projection, newX, x, n1, m1)
 
 			l = l+1
@@ -66,18 +88,19 @@ def scrabble_optimization(data_path = './demo_data.mat', parameters = [1, 1e-6, 
 			print('The %d-th INNNER iteration and the error is %1.4e\n'%(l,error_inner))
 		S = newX + Lambda/gamma
 		tau = alpha/gamma
-		#u, s, v = svt(S, 'lambda', tau)
-		u, s, v = svd(S,full_matrices=False)
 
-		#newY = u*np.diag(s-tau).T*np.transpose(v)
-		#print(u.shape,np.diag(s-tau).shape,v.T.shape,s.shape)
+		#calculate SVT
+		u, s, v = svd(S,full_matrices=False)
 		newY = np.dot(np.dot(u,np.diag(s-tau)),np.transpose(v))
+
 		error = np.linalg.norm(np.log10(X+1)-np.log10(newX+1), ord = 'fro')/(m1*n1)
 		if k == 0:
 			error = 1
 		k = k+1
 		Lambda = Lambda+gamma*(newX-newY)
 		print('The %d-th iteration and the error is %1.4e\n'%(k,error))
+
+	#Plot the Results
 	fig, (ax1, ax2,ax3) = plt.subplots(1, 3)
 	ax1.imshow(np.log10(original_data_without_droputs+1))
 	ax1.set_title("Orignal Data") 
